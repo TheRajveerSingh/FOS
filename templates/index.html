@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figure of Speech Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+    <div id="floating-text-container"></div>
+
+    <div class="container">
+        <header>
+            <h1>Figure of Speech <span class="highlight">Detector</span></h1>
+            <p>Discover the hidden literary devices in your writing using our rule-based NLP tool.</p>
+        </header>
+
+        <main>
+            <div class="input-section glass-panel">
+                <div class="controls">
+                    <label for="sample-select">Try a sample:</label>
+                    <select id="sample-select">
+                        <option value="">-- Select a sample --</option>
+                        <option value="He was as brave as a lion during the battle.">Simile</option>
+                        <option value="The city is a nightmare during rush hour.">Metaphor</option>
+                        <option value="The wind whispered through the ancient trees.">Personification</option>
+                        <option value="I've told you a million times to clean your room!">Hyperbole</option>
+                        <option value="Peter Piper picked a peck of pickled peppers.">Alliteration</option>
+                        <option value="It was the best of times, it was the worst of times.">Anaphora</option>
+                        <option value="The room fell into a deafening silence.">Oxymoron</option>
+                        <option value="The math test was a piece of cake.">Idiom</option>
+                        <option value="Oh, great. Just what I needed today.">Sarcasm & Irony</option>
+                        <option value="The fire station burned down while the firefighters were out rescuing a kitten.">
+                            Situational Irony</option>
+                        <option
+                            value="The sun smiled down on the city, which was a machine of endless noise. It was awfully good to be home.">
+                            Multiple Figures</option>
+                    </select>
+                </div>
+
+                <textarea id="text-input" placeholder="Type or paste your sentence/paragraph here..."></textarea>
+
+                <button id="analyze-btn">
+                    <span class="btn-text">Analyze Text</span>
+                    <span class="btn-loader loader hidden"></span>
+                </button>
+            </div>
+
+            <div id="results-container" class="results-section hidden">
+                <h2>Detection Results</h2>
+                <div id="results-list" class="results-list">
+                    <!-- Results will be injected here via JS -->
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Built upon NLP concepts: Tokenization, POS Tagging, N-grams, Regex-based Pattern Matching, Lexical
+                Analysis, Basic Morphological Analysis, Syntactic Pattern Recognition, Semantic Interpretation of
+                Figurative Language, Relation between Senses, and Discourse-level Repetition Detection.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
