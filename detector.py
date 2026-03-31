@@ -131,7 +131,7 @@ def analyze_text(text):
                  })
 
         # ====== 7. Oxymoron ======
-        oxymorons = ["jumbo shrimp", "deafening silence", "bittersweet", "living dead", "awfully good", "open secret", "original copy", "only choice", "liquid gas", "virtual reality", "old news"]
+        oxymorons = ["jumbo shrimp", "deafening silence", "bittersweet", "living dead", "awfully good", "open secret", "original copy", "only choice", "liquid gas", "virtual reality", "old news", "pretty ugly"]
         for oxy in oxymorons:
             if oxy in sentence_lower:
                 match = re.search(re.escape(oxy), sentence, re.IGNORECASE)
