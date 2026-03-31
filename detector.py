@@ -1,5 +1,6 @@
 import re
 import nltk
+import difflib
 from nltk.tokenize import word_tokenize, sent_tokenize
 
 # Ensure datasets are available
@@ -18,6 +19,42 @@ def highlight_context(sentence, match_text):
         return sentence[:match.start()] + f"<mark>{match.group()}</mark>" + sentence[match.end():]
     return sentence
 
+def is_self_comparison(phrase):
+    phrase_lower = phrase.lower()
+    
+    def are_words_same(w1, w2):
+        if w1 == w2:
+            return True
+        if len(w1) >= 4 and len(w2) >= 4:
+            if difflib.SequenceMatcher(None, w1, w2).ratio() >= 0.88:
+                return True
+        return False
+
+    stopwords = {'a', 'an', 'the', 'is', 'are', 'was', 'were', 'like', 'as'}
+    
+    if ' like ' in phrase_lower:
+        parts = re.split(r'\blike\b', phrase_lower, 1)
+        if len(parts) == 2:
+            left_words = [w for w in re.findall(r'\w+', parts[0]) if w not in stopwords]
+            right_words = [w for w in re.findall(r'\w+', parts[1]) if w not in stopwords]
+            for lw in left_words:
+                for rw in right_words:
+                    if are_words_same(lw, rw):
+                        return True
+                        
+    match = re.search(r'(.*?)\bas\b.*?\bas\b(.*)', phrase_lower)
+    if match:
+        left_part = match.group(1)
+        right_part = match.group(2)
+        left_words = [w for w in re.findall(r'\w+', left_part) if w not in stopwords]
+        right_words = [w for w in re.findall(r'\w+', right_part) if w not in stopwords]
+        for lw in left_words:
+            for rw in right_words:
+                if are_words_same(lw, rw):
+                    return True
+                    
+    return False
+
 def analyze_text(text):
     results = []
     
@@ -33,14 +70,15 @@ def analyze_text(text):
         # Improved: Extract up to 2 words before 'like'/'as' and 2 words after to give better phrase
         # E.g., "shines like a diamond", "was as brave as a lion"
         simile_patterns = [
-            (r'\b((?:\w+\s+){1,2}as\s+\w+\s+as\s+(?:\w+\s*){1,2})\b', "Regex matching 'as [word] as' with surrounding context."),
-            (r'\b((?:\w+\s+){1,2}like\s+(?:a|an|the)?\s*\w+)\b', "Regex matching '[words] like a/an/the [word]'.")
+            (r'\b((?:\w+\s+){0,2}as\s+\w+\s+as\s+(?:\w+\s*){1,2})\b', "Regex matching 'as [word] as' with surrounding context."),
+            (r'\b((?:\w+\s+){0,2}like\s+(?:a|an|the)?\s*\w+)\b', "Regex matching '[words] like a/an/the [word]'.")
         ]
         for pattern, algo in simile_patterns:
             for match in re.finditer(pattern, sentence, re.IGNORECASE):
                 phrase = match.group(0).strip()
                 if not any(stop in phrase.lower() for stop in ["i like", "you like", "we like", "they like", "looks like", "seems like"]):
-                    results.append({
+                    if not is_self_comparison(phrase):
+                        results.append({
                         "name": "Simile",
                         "text": phrase,
                         "explanation": "A direct comparison using 'like' or 'as'.",
@@ -202,6 +240,24 @@ def analyze_text(text):
                          "context": highlight_context(sentence, match.group(0))
                      })
 
+        # ====== 11. Transferred Epithet ======
+        human_adjectives = {"angry", "wonderful", "weary", "nervous", "sleepless", "happy", "sad", "cruel", "blind", "lazy", "cheerful", "anxious", "melancholy", "restless", "busy", "guilty", "terrified", "frightened", "bored", "jealous", "suspicious", "proud", "lonely", "joyful", "sorrowful", "unhappy", "glad", "mad", "dreary", "bleak"}
+        inanimate_targets = {"finger", "day", "road", "smile", "night", "pillow", "sky", "wind", "sea", "journey", "room", "house", "city", "chair", "bed", "morning", "evening", "hour", "year", "mind", "heart", "tear", "tears", "street", "silence", "shadow", "song", "task", "work", "duty", "life", "world", "path", "wood", "glass"}
+        
+        for i in range(len(tagged) - 1):
+            if tagged[i][1] in ['JJ', 'JJR', 'JJS'] and tagged[i+1][1] in ['NN', 'NNS']:
+                adj = tagged[i][0].lower()
+                noun = tagged[i+1][0].lower()
+                if adj in human_adjectives and noun in inanimate_targets:
+                    phrase = f"{tagged[i][0]} {tagged[i+1][0]}"
+                    results.append({
+                        "name": "Transferred Epithet",
+                        "text": phrase,
+                        "explanation": "An adjective describing a human emotion/state is applied to an inanimate object or concept.",
+                        "algorithm_explanation": f"POS Tagging found adjective '{adj}' (human emotion) modifying noun '{noun}' (inanimate object).",
+                        "context": highlight_context(sentence, phrase)
+                    })
+
     # ====== 6. Anaphora (Evaluates across multiple sentences/clauses) ======
     clauses = re.split(r'[,;.]\s*', text)
     clauses = [c for c in clauses if len(c.split()) > 0]
@@ -217,6 +273,26 @@ def analyze_text(text):
                 "algorithm_explanation": f"Analyzed sub-clause boundaries (punctuation split) and validated that consecutive clauses begin with the exact same valid word '{words1[0]}'.",
                 "context": f"...<mark>{words1[0]}</mark> {' '.join(words1[1:4])}... <mark>{words2[0]}</mark> {' '.join(words2[1:4])}..."
             })
+
+    # ====== 12. Enjambment (Evaluates across multiple lines) ======
+    lines = text.split('\n')
+    for i in range(len(lines) - 1):
+        current_line = lines[i].strip()
+        next_line = lines[i+1].strip()
+        
+        if current_line and next_line:
+            if current_line[-1] not in ['.', ',', ';', ':', '!', '?']:
+                if len(current_line.split()) >= 3:
+                     phrase = "Line break without punctuation"
+                     c_line_display = current_line if len(current_line) < 50 else "..." + current_line[-47:]
+                     n_line_display = next_line if len(next_line) < 50 else next_line[:47] + "..."
+                     results.append({
+                         "name": "Enjambment",
+                         "text": phrase,
+                         "explanation": "A sentence or clause continues across a line break without terminal punctuation.",
+                         "algorithm_explanation": f"Line ended with '{current_line[-1]}' instead of punctuation, flowing directly into the next line.",
+                         "context": f"{c_line_display} <mark>↵</mark> {n_line_display}"
+                     })
 
     # Exact Match Deduplication ONLY (allows multiple different similes etc.)
     unique_results = []
