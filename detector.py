@@ -118,7 +118,13 @@ def analyze_text(text):
                 })
 
         # ====== 4. Hyperbole ======
-        hyperboles = ["million times", "tons of", "takes forever", "weighs a ton", "dying of", "best in the world", "end of the world"]
+        hyperboles = [
+            "million times", "tons of", "takes forever", "weighs a ton", "dying of", "best in the world", "end of the world",
+            "extremely", "absolutely", "totally", "completely", "utterly", "incredibly", "unbelievably", "insanely", "ridiculously", "exceptionally",
+            "always", "never", "everyone", "no one", "everything", "nothing", "forever", "all the time",
+            "millions of", "billions of", "endless", "countless", "infinite", "a mountain of", "a flood of",
+            "for ages", "an eternity", "in a second", "in no time"
+        ]
         for hyp in hyperboles:
             if hyp in sentence_lower:
                 match = re.search(re.escape(hyp), sentence, re.IGNORECASE)
