@@ -16,48 +16,101 @@
     <div id="floating-text-container"></div>
 
     <div class="container">
-        <header>
-            <h1>Figure of Speech <span class="highlight">Detector</span></h1>
-            <p>Discover the hidden literary devices in your writing using our rule-based NLP tool.</p>
+        <header style="text-align: center;">
+            <div class="title-container">
+                <h1>Figure of Speech <span id="app-title-highlight" class="highlight">Detector</span></h1>
+                <p id="app-description" style="margin: 0 auto;">Discover the hidden literary devices in your writing using our rule-based NLP tool.</p>
+            </div>
         </header>
+        
+        <!-- Top Right Toggle -->
+        <div class="mode-toggle">
+            <span class="toggle-label">Detector</span>
+            <label class="switch">
+                <input type="checkbox" id="mode-switch">
+                <span class="slider round"></span>
+            </label>
+            <span class="toggle-label poetic-label">Generator</span>
+        </div>
 
-        <main>
-            <div class="input-section glass-panel">
-                <div class="controls">
-                    <label for="sample-select">Try a sample:</label>
-                    <select id="sample-select">
-                        <option value="">-- Select a sample --</option>
-                        <option value="He was as brave as a lion during the battle.">Simile</option>
-                        <option value="The city is a nightmare during rush hour.">Metaphor</option>
-                        <option value="The wind whispered through the ancient trees.">Personification</option>
-                        <option value="I've told you a million times to clean your room!">Hyperbole</option>
-                        <option value="Peter Piper picked a peck of pickled peppers.">Alliteration</option>
-                        <option value="It was the best of times, it was the worst of times.">Anaphora</option>
-                        <option value="The room fell into a deafening silence.">Oxymoron</option>
-                        <option value="The math test was a piece of cake.">Idiom</option>
-                        <option value="Oh, great. Just what I needed today.">Sarcasm & Irony</option>
-                        <option value="The fire station burned down while the firefighters were out rescuing a kitten.">
-                            Situational Irony</option>
-                        <option
-                            value="The sun smiled down on the city, which was a machine of endless noise. It was awfully good to be home.">
-                            Multiple Figures</option>
-                        <option value="The tired soldier walked on the weary road.">Transferred Epithet</option>
-                        <option value="I think that I shall never see&#10;A poem lovely as a tree.">Enjambment</option>
-                    </select>
+        <main class="view-container">
+            <!-- View 1: Detection -->
+            <div id="detection-view" class="view active-view">
+                <div class="input-section glass-panel">
+                    <div class="controls">
+                        <label for="sample-select">Try a sample:</label>
+                        <select id="sample-select">
+                            <option value="">-- Select a sample --</option>
+                            <option value="He was as brave as a lion during the battle.">Simile</option>
+                            <option value="The city is a nightmare during rush hour.">Metaphor</option>
+                            <option value="The wind whispered through the ancient trees.">Personification</option>
+                            <option value="I've told you a million times to clean your room!">Hyperbole</option>
+                            <option value="Peter Piper picked a peck of pickled peppers.">Alliteration</option>
+                            <option value="It was the best of times, it was the worst of times.">Anaphora</option>
+                            <option value="The room fell into a deafening silence.">Oxymoron</option>
+                            <option value="The math test was a piece of cake.">Idiom</option>
+                            <option value="Oh, great. Just what I needed today.">Sarcasm & Irony</option>
+                            <option value="The fire station burned down while the firefighters were out rescuing a kitten.">
+                                Situational Irony</option>
+                            <option
+                                value="The sun smiled down on the city, which was a machine of endless noise. It was awfully good to be home.">
+                                Multiple Figures</option>
+                            <option value="The tired soldier walked on the weary road.">Transferred Epithet</option>
+                            <option value="I think that I shall never see&#10;A poem lovely as a tree.">Enjambment</option>
+                        </select>
+                    </div>
+
+                    <textarea id="text-input" placeholder="Type or paste your sentence/paragraph here..."></textarea>
+
+                    <button id="analyze-btn">
+                        <span class="btn-text">Analyze Text</span>
+                        <span class="btn-loader loader hidden"></span>
+                    </button>
                 </div>
-
-                <textarea id="text-input" placeholder="Type or paste your sentence/paragraph here..."></textarea>
-
-                <button id="analyze-btn">
-                    <span class="btn-text">Analyze Text</span>
-                    <span class="btn-loader loader hidden"></span>
-                </button>
+                
+                <div id="results-container" class="results-section hidden">
+                    <h3>Detection Results</h3>
+                    <div id="results-list" class="results-list">
+                        <!-- Results will be injected here via JS -->
+                    </div>
+                </div>
             </div>
 
-            <div id="results-container" class="results-section hidden">
-                <h2>Detection Results</h2>
-                <div id="results-list" class="results-list">
-                    <!-- Results will be injected here via JS -->
+            <!-- View 2: Enhancement -->
+            <div id="enhancement-view" class="view hidden-view" style="display: none;">
+                <div class="input-section glass-panel">
+                    <div class="controls">
+                        <label for="enhance-sample-select">Try a sample:</label>
+                        <select id="enhance-sample-select">
+                            <option value="">-- Select a poetic sample --</option>
+                            <option value="The wind blows through the city streets.&#10;It is very cold outside.&#10;People are walking fast.&#10;The sky is dark.&#10;I am tired after a long day.&#10;I want to go home.">City Winter (Basic)</option>
+                            <option value="The sun beats down on the sand.&#10;The ocean waves crash onto the shore.&#10;The birds fly high in the sky.&#10;It is a beautiful day.&#10;Life is good right now.&#10;I hope this moment lasts.">Summer Beach (Basic)</option>
+                            <option value="He is a strong fighter.&#10;His sword is heavy.&#10;The battle is long and bloody.&#10;Many soldiers have fallen today.&#10;He is hungry and thirsty.&#10;But he will never give up.">The Warrior (Basic)</option>
+                        </select>
+                    </div>
+
+                    <textarea id="enhance-text-input" placeholder="Type or paste your paragraph here to rewrite it with poetic devices (minimum 6 lines required)..."></textarea>
+                    
+                    <button id="enhance-btn" class="accent-btn">
+                        <span class="btn-text">Generate Poetic Version</span>
+                        <span class="btn-loader loader hidden"></span>
+                    </button>
+                </div>
+
+                <div id="enhance-results-container" class="results-section hidden">
+                    <h3>Enhanced Text</h3>
+                    <div class="enhance-results-panel glass-panel">
+                        <div id="enhance-output-text" class="poetic-output"></div>
+                        <div class="devices-used-section">
+                            <h4>Devices Added:</h4>
+                            <div id="enhance-devices-list" class="devices-badge-container"></div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 2rem;">Enhancement Breakdown</h3>
+                    <div id="enhance-explanation-list" class="results-list">
+                        <!-- Explanations will be injected here via JS -->
+                    </div>
                 </div>
             </div>
         </main>

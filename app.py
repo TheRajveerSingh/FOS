@@ -33,6 +33,23 @@ def analyze():
         print("Error during analysis:", error_msg)
         return jsonify({"error": str(e), "traceback": error_msg}), 500
 
+@app.route('/enhance', methods=['POST'])
+def enhance():
+    try:
+        data = request.json
+        text = data.get('text', '')
+        if not text:
+            return jsonify({"error": "No text provided"}), 400
+        
+        from enhancer import enhance_text
+        result = enhance_text(text)
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        error_msg = traceback.format_exc()
+        print("Error during enhancement:", error_msg)
+        return jsonify({"error": str(e), "traceback": error_msg}), 500
+
 if __name__ == '__main__':
     setup_nltk()
     app.run(debug=True, port=5000)
