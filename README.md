@@ -1,11 +1,11 @@
-# Figure of Speech Detector
+# Figure of Speech Detector & Poetic Generator
 
-A Flask-based Natural Language Processing (NLP) web application designed to automatically detect and explain various figures of speech in normal human text.
+A Flask-based Natural Language Processing (NLP) web application designed to automatically detect for various figures of speech in text or transform them into poetic masterpieces.
 
 ## 📌 Project Overview
-The "Figure of Speech Detector" allows users to input custom text or select from predefined samples to identify deeply embedded literary devices. Rather than relying on heavy predictive Machine Learning models (like LLMs), this system is built entirely on **rule-based NLP mechanics**. It breaks down each sentence and analyzes its core grammatical structure to spot stylistic language.
+The "Figure of Speech" app features a Dual-Mode interface that allows users to identify deeply embedded literary devices or generate poetic enhancements. Rather than relying on heavy predictive Machine Learning models (like LLMs), this system is built entirely on **rule-based NLP mechanics**. It breaks down text structure to spot stylistic language and injects creative flair.
 
-Currently, the system successfully detects:
+Currently, the system successfully detects 12 figures of speech:
 - **Simile**
 - **Metaphor**
 - **Personification**
@@ -16,19 +16,26 @@ Currently, the system successfully detects:
 - **Idiom**
 - **Sarcasm**
 - **Situational Irony**
+- **Transferred Epithet**
+- **Enjambment**
 
 ## 🤔 Why It Was Made
-This project was designed as a College Mini Project for a Natural Language Processing curriculum. The core objective was to demonstrate a functional understanding of foundational NLP concepts without abstracting the logic away into a black-box machine learning model. By using explicit rules, the project provides **explainable results**, clearly mapping out *why* a specific string of text was flagged as a figure of speech.
+This project was designed as a College Mini Project for a Natural Language Processing curriculum. The core objective was to demonstrate a functional understanding of foundational NLP concepts without abstracting the logic away into a black-box machine learning model. By using explicit rules and curated templates, the project provides **explainable results** and **transparent generation**, clearly mapping out *why* a specific string of text was flagged or how it was enhanced.
+
+## ✨ Poetic Generator Mode
+The new **Generator Mode** takes basic, flat text and transforms it into a more evocative, poetic version.
+- **Rule of Six:** Requires at least 6 lines of text to ensure enough context for poetic flow.
+- **Intelligent Injection:** Randomly applies Similes, Metaphors, and Personification based on identified Parts-of-Speech.
+- **Anaphora Injection:** Occasionally adds repetitive structural markers at the end of the text for a rhythmic conclusion.
+- **Detailed Logs:** Shows a "Before & After" breakdown for every transformation applied.
 
 ## 🚀 How to Use It
 1. Launch the web application.
-2. Use the provided text box to type or paste any paragraph, poem, or sentence.
-3. Click "Analyze Text".
-4. Read through the generated result cards! Each card will:
-   - Identify the figure of speech.
-   - Visually highlight the exact phrase within the context of the original sentence.
-   - Provide a human-friendly definition.
-   - Provide an "Algorithm Logic" breakdown explaining how the backend Python script detected it.
+2. **Choose Your Mode:** Use the toggle in the top-right to switch between **Detector** and **Generator**.
+3. **Input Text:** Use the provided text box to type or paste any paragraph, poem, or sentence.
+4. **View Results:**
+   - **In Detector Mode:** Read through the generated result cards showing the device name, context, and algorithm logic.
+   - **In Generator Mode:** View the transformed "Poetic Version" and see the list of devices specifically injected into your text.
 
 ## 🧠 NLP Concepts Utilized
 This project leans heavily on classical Natural Language Processing methodologies:
@@ -65,7 +72,9 @@ Then navigate to `http://127.0.0.1:5000` in your web browser.
 - **`app.py`**
   - *Why it exists:* The main HTTP server written in Flask. It acts as the bridge routing data between the frontend user interface and the backend Python logic. It also handles the safety checks for downloading missing NLTK datasets.
 - **`detector.py`**
-  - *Why it exists:* The brain of the project. It houses the `analyze_text(text)` function, decoupling the heavy NLP logic from the web server. This file iterates through the tokenized text, applies the 10 detection algorithms, and formats the output logs.
+  - *Why it exists:* The brain of the detection engine. It houses the `analyze_text(text)` function, iterating through tokenized text to apply 12 detection algorithms and format the output logs.
+- **`enhancer.py`**
+  - *Why it exists:* The generator engine. It uses POS-based template matching to transform flat sentences into poetic ones, maintaining a "Rule of Six" for minimum input length.
 - **`templates/index.html`**
   - *Why it exists:* The structural frontend of the web app. Contains the dropdowns, input areas, and `<mark>` structural layouts.
 - **`static/css/style.css`**

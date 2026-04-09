@@ -1,7 +1,7 @@
 # Figure of Speech Detector: Project Overview
 
 ## 1. What We Have Done
-We have built a transparent, rule-based Natural Language Processing (NLP) web application capable of identifying and explaining 12 distinct figures of speech within user-provided text. The underlying engine runs on Python via Flask, leveraging the `nltk` (Natural Language Toolkit) library alongside sophisticated regular expressions. The front-end features a modern, animated, glassmorphic dark-mode interface built with HTML, CSS, and vanilla JavaScript that highlights matched text and explains the specific algorithmic rule used to detect each figure of speech.
+We have built a transparent, rule-based Natural Language Processing (NLP) web application capable of **identifying 12 distinct figures of speech** and **generating poetic enhancements** for user-provided text. The underlying engine runs on Python via Flask, leveraging the `nltk` library alongside sophisticated regular expressions and POS-based template matching. The front-end features a modern, animated, glassmorphic dark-mode interface with a dual-mode toggle between detection and generation.
 
 ## 2. Why It Was Done
 The goal was to create an educational and analytical tool that goes beyond "black-box" AI models. Rather than just predicting that a sentence contains a metaphor, this project explicitly outlines *how* it arrived at that conclusion (e.g., pointing out the precise part-of-speech structure or keyword matches). It's designed to help writers, students, and language enthusiasts understand literary devices while demonstrating practical applications of foundational NLP concepts in a highly visual, interactive way.
@@ -37,12 +37,26 @@ The goal was to create an educational and analytical tool that goes beyond "blac
 
 ---
 
-## 4. Project Files & Their Roles
+## 4. Poetic Enhancer (Generator Mode) Logic
+
+The Poetic Generator transforms standard text into a more literary version by "injecting" stylistic devices based on the grammatical structure of the input.
+
+*   **Input Constraint:** Requires at least 6 lines of text to ensure the output maintains a poetic flow and rhythmic structure.
+*   **Simile Transformation:** Identifies key adjectives (e.g., "bright", "strong") and appends a randomized comparative phrase from a curated dictionary (e.g., "bright like a newborn star").
+*   **Metaphor Construction:** Detects a Noun + "To-Be" verb structure and replaces the object with a metaphorical target (e.g., "Life is a journey").
+*   **Personification Injection:** Identifies inanimate nouns followed by verbs and replaces the action with a human-centric verb (e.g., "The wind whispered").
+*   **Alliteration Matching:** Occasionally flags a noun and prepends an adjective starting with the same consonant to create a phonetic "streak" (e.g., "Silent sky").
+*   **Rhythmic Anaphora:** Analyzes the final lines of the text and prepends uniform markers (e.g., "And yet...", "Beyond the horizon...") to create a sense of poetic repetition and closure.
+
+---
+
+## 5. Project Files & Their Roles
 
 | File path | Purpose |
 | :--- | :--- |
-| **`detector.py`** | The core AI/NLP engine. It imports `nltk` and `re`, processes incoming text via the `analyze_text()` function, houses all the dictionaries and logic rules described above, and returns structured dictionaries of findings. |
-| **`app.py`** | The backend Flask web server. It handles routing (`/`), serves the static HTML file, pre-downloads necessary NLTK datasets at startup, and provides the `/analyze` POST endpoint to bridge the UI with `detector.py`. |
+| **`detector.py`** | The core detection engine. It processes incoming text via the `analyze_text()` function and returns a list of detected figures with algorithmic explanations. |
+| **`enhancer.py`** | The poetic generation engine. It processes text via the `enhance_text()` function, applying a "Rule of Six" and injecting devices via template randomization. |
+| **`app.py`** | The backend Flask web server. It handles routing for both `/analyze` and `/enhance` endpoints and manages NLTK dataset initialization. |
 | **`templates/index.html`** | The structure of the user interface. It contains the title, interactive text area, "Try a sample" dropdown, and the empty container where javascript injects the results. |
 | **`static/css/style.css`** | The visual styling of the app. It creates the modern, premium aesthetic including the dark mode background, glassmorphic (frosted glass) panels, typography, and hover animations for the interactive elements. |
 | **`static/js/script.js`** | The frontend logic. It listens for button clicks, sends the user's text to the Flask API asynchronously using `fetch`, handles the loading spinners, and dynamically generates HTML cards for the returned figures of speech. |
@@ -50,7 +64,7 @@ The goal was to create an educational and analytical tool that goes beyond "blac
 
 ---
 
-## 5. NLP Concepts Covered
+## 6. NLP Concepts Covered
 
 * **Tokenization:** Breaking down paragraphs into individual sentences (`sent_tokenize`), and sentences into individual words/punctuation (`word_tokenize`) to allow programmatic analysis.
 * **Part-of-Speech (POS) Tagging:** Using the NLTK Perceptron tagger to classify words into their grammatical roles (Nouns, Verbs, Adjectives). Used heavily in Metaphor, Personification, and Transferred Epithet detection.
@@ -58,3 +72,5 @@ The goal was to create an educational and analytical tool that goes beyond "blac
 * **Syntactic Pattern Recognition:** Using Regular Expressions to map complex sentence structures (like interjections followed by adjectives, or separated `as...as` boundaries).
 * **Discourse & Paragraph-Level Mapping:** Tracking structural features that span across boundaries—such as consecutive clauses (Anaphora) and line-breaks (Enjambment).
 * **Fuzzy String Matching / Edit Distance:** Using sequence matchers (`difflib`) to measure character similarity between words, preventing false similarities and spelling typos from breaking comparisons.
+* **Template-Based Text Generation:** Utilizing slot-filling and randomization within curated lexical dictionaries to transform sentence semantics without losing structural coherence.
+* **Non-Deterministic Heuristics:** Applying probabilistic triggers (randomized weights) to determine when and where a figure of speech should be injected during the generation process.

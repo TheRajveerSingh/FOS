@@ -265,20 +265,51 @@ def analyze_text(text):
                     })
 
     # ====== 6. Anaphora (Evaluates across multiple sentences/clauses) ======
-    clauses = re.split(r'[,;.]\s*', text)
-    clauses = [c for c in clauses if len(c.split()) > 0]
-    for i in range(len(clauses) - 1):
-        words1 = clauses[i].split()
-        words2 = clauses[i+1].split()
-        if words1[0].lower() == words2[0].lower() and words1[0].isalpha():
-            phrase = f"'{words1[0]}' at start of consecutive clauses"
-            results.append({
-                "name": "Anaphora",
-                "text": phrase,
-                "explanation": f"Repetition of '{words1[0]}' at the beginning of consecutive clauses.",
-                "algorithm_explanation": f"Analyzed sub-clause boundaries (punctuation split) and validated that consecutive clauses begin with the exact same valid word '{words1[0]}'.",
-                "context": f"...<mark>{words1[0]}</mark> {' '.join(words1[1:4])}... <mark>{words2[0]}</mark> {' '.join(words2[1:4])}..."
-            })
+    clauses_raw = re.split(r'([,;.]\s*)', text)
+    # Reassemble to preserve separators for indexing if needed, but for anaphora we want the content
+    # Let's simplify and just get the clean text segments while knowing their order
+    segments = []
+    for s in re.split(r'[,;.]\s*', text):
+        if s.strip():
+            segments.append(s.strip())
+            
+    i = 0
+    while i < len(segments) - 1:
+        words1 = segments[i].split()
+        words2 = segments[i+1].split()
+        
+        # Find longest common prefix
+        common_words = []
+        for w1, w2 in zip(words1, words2):
+            if w1.lower() == w2.lower():
+                common_words.append(w1)
+            else:
+                break
+        
+        if common_words:
+            # Check how many consecutive segments share this prefix
+            prefix_lower = [w.lower() for w in common_words]
+            match_count = 1
+            k = i + 1
+            while k < len(segments):
+                k_words = segments[k].split()
+                if len(k_words) >= len(prefix_lower) and [w.lower() for w in k_words[:len(prefix_lower)]] == prefix_lower:
+                    k += 1
+                else:
+                    break
+            
+            match_count = k - i
+            if match_count >= 2:
+                phrase = " ".join(common_words)
+                results.append({
+                    "name": "Anaphora",
+                    "text": f"'{phrase}' repeated",
+                    "explanation": f"Repetition of the phrase '{phrase}' at the beginning of {match_count} consecutive clauses/sentences.",
+                    "algorithm_explanation": f"Greedy prefix matcher identified a {len(common_words)}-word shared sequence '{phrase}' across {match_count} segments.",
+                    "context": f"...<mark>{phrase}</mark> {' '.join(words1[len(common_words):len(common_words)+3])}... <mark>{phrase}</mark> {' '.join(words2[len(common_words):len(common_words)+3])}..."
+                })
+                i = k - 1 # Skip segments we've already matched as the 'start'
+        i += 1
 
     # ====== 12. Enjambment (Evaluates across multiple lines) ======
     lines = text.split('\n')
