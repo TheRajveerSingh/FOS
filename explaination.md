@@ -100,3 +100,23 @@ Used in **Generator Mode** to transform standard prose into evocative poetry.
     - In **Detector Mode**, `detector.py` breaks the text down and returns every captured figure of speech with an "Algorithm Logic" explanation.
     - In **Generator Mode**, `enhancer.py` identifies "slots" for poetic improvement and injects random figurative tropes.
 4.  **Display:** The results are parsed by the frontend and displayed as vibrant, category-colored "Cards" that highlight the specific text segment found or modified.
+...............................
+..................................
+Here are the explanations for the technical terms used in your project, specifically tailored to how they contribute to your application’s logic:
+
+1. Punkt (Sentence Tokenizer)
+What it is: Punkt is an unsupervised trainable model used by NLTK for Sentence Tokenization.
+Role in your project: It allows the backend to take a large paragraph of text and accurately split it into individual sentences. It is "smarter" than just splitting at every period because it knows the difference between a period in an abbreviation (like "Dr." or "U.S.") and a period at the end of a sentence.
+Usage: In detector.py, it ensures each sentence is analyzed independently for figures of speech.
+2. Average Perceptron (POS Tagger)
+What it is: The averaged_perceptron_tagger is the machine learning model NLTK uses for Part-of-Speech (POS) Tagging.
+Role in your project: It assigns grammatical labels (tags) to every word in a sentence—identifying which words are Nouns, Verbs, Adjectives, etc. It uses a "Perceptron" (a type of linear classifier) that has been trained on massive datasets of English text.
+Usage: It is the "brain" of your detectors. For example, it helps identify Metaphors by finding nouns (NN) and Transferred Epithets by finding human-centric adjectives (JJ) followed by inanimate nouns (NN).
+3. Regex (Regular Expression)
+What it is: A Regex is a special sequence of characters that forms a search pattern used for String Matching.
+Role in your project: It allows for highly specific pattern detection that standard search functions cannot handle.
+Usage: In your Simile detector, Regex is used to find patterns like as [any_word] as or [any_word] like a [word]. In Alliteration, it is used to find words starting with the same consonant even if they are separated by punctuation or varying whitespace.
+4. Rhythmic Anaphora Addition
+What it is: This is a Generative NLP Heuristic specifically implemented in your enhancer.py file to improve the artistic quality of the text.
+Role in your project: While detection focuses on finding existing patterns, this logic focuses on creating them. Anaphora is the repetition of a word or phrase at the beginning of successive sentences.
+Usage: In your Poetic Generator, once the "Rule of Six" is met, the system randomly selects a rhythmic phrase (e.g., "And yet," or "Beyond the horizon,") and injects it at the start of the final two lines. This creates a musical, professional "finish" to the generated poetry.
