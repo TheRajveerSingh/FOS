@@ -77,3 +77,4 @@ The Poetic Generator transforms standard text into a more literary version by "i
 --------
 Need to add: transformers, HuggingFace, 
 Can also try: RNN, LSTM, LLM
+Next Sprint: Try Machine Learning instead of Rule-Based
