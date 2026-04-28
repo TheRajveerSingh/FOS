@@ -75,4 +75,5 @@ The Poetic Generator transforms standard text into a more literary version by "i
 * **Template-Based Text Generation:** Utilizing slot-filling and randomization within curated lexical dictionaries to transform sentence semantics without losing structural coherence.
 * **Non-Deterministic Heuristics:** Applying probabilistic triggers (randomized weights) to determine when and where a figure of speech should be injected during the generation process.
 --------
-Need to add: transformers, HuggingFace
+Need to add: transformers, HuggingFace, 
+Can also try: RNN, LSTM, LLM
