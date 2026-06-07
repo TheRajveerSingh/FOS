@@ -3,7 +3,7 @@
 A Flask-based Natural Language Processing (NLP) web application designed to automatically detect for various figures of speech in text or transform them into poetic masterpieces.
 
 ## 📌 Project Overview
-The "Figure of Speech" app features a Dual-Mode interface that allows users to identify deeply embedded literary devices or generate poetic enhancements. Rather than relying on heavy predictive Machine Learning models (like LLMs), this system is built entirely on **rule-based NLP mechanics**. It breaks down text structure to spot stylistic language and injects creative flair.
+The "Figure of Speech" app features a Dual-Mode interface that allows users to identify deeply embedded literary devices or generate poetic enhancements. The system is a **hybrid NLP engine** that combines traditional rule-based mechanics with deep learning transformers and semantic modeling for high-accuracy detection.
 
 Currently, the system successfully detects 12 figures of speech:
 - **Simile**
@@ -46,17 +46,69 @@ This project leans heavily on classical Natural Language Processing methodologie
 - **Basic Syntactic Pattern Recognition:** Utilizing sequential matching logic rather than bag-of-words to preserve structural meaning.
 - **Discourse-Level Repetition Detection:** Analyzing structural repetition across multiple subsequent clauses (used to detect *Anaphora*).
 
+## 🆕 Updates
+
+This project has recently been upgraded from a purely rule-based system to a hybrid engine that integrates deep learning transformers, sentiment analysis, and semantic modeling.
+
+### 📁 New Project Structure
+- **`ml_models.py`**: A new dedicated module that loads heavy models (RoBERTa, Brown Corpus, WordNet) once at startup to ensure high performance and resource reuse across requests.
+
+### 🧠 New NLP Concepts & Upgrades
+
+1. **RoBERTa Transformer — Sarcasm Detection**
+   - **Old:** Hardcoded list of 8 exact phrases (e.g., "yeah, right").
+   - **New:** Integration of the `cardiffnlp/twitter-roberta-base-irony` transformer model. It reads the entire sentence and classifies it as IRONY or NON_IRONY with a probability score.
+   - **Why:** Sarcasm depends on context and tone. A transformer handles the linguistic nuance far better than static keywords.
+
+2. **VADER Sentiment Analysis — Hyperbole Detection**
+   - **Old:** All hyperbole markers (e.g., "extremely", "always") were flagged regardless of context.
+   - **New:** Two-tier detection. "Hard markers" always fire, while "Weak intensifiers" only fire when **VADER's compound sentiment score** exceeds ±0.55.
+   - **Why:** Adds an emotional charge requirement to reduce false positives in common speech.
+
+3. **WordNet Semantic Distance — Metaphor Detection**
+   - **Old:** Limited to a fixed list of 12 predicate nouns.
+   - **New:** Uses **WordNet’s Wu-Palmer similarity score** to measure semantic distance between subject and predicate nouns. A score below 0.35 confirms a metaphor.
+   - **Why:** Captures the linguistic intuition that metaphors equate two things from unrelated semantic domains.
+
+4. **WordNet Synonym Filter — Simile False Positive Reduction**
+   - **Old:** Pure regex pattern matching (`X like Y`).
+   - **New:** After regex matching, WordNet checks if the compared words share synonyms. If they do, it's flagged as a possible false positive.
+   - **Why:** Distinguishes between meaningful comparisons and trivial ones (e.g., "He runs like he runs").
+
+5. **Brown Corpus N-gram Model — Idiom Detection**
+   - **Old:** A hardcoded list of exactly 10 idioms.
+   - **New:** A **bigram language model** trained on the entire Brown corpus (~1 million words). Phrases with very low log-probability (below -11.5) are flagged as potential idioms.
+   - **Why:** Automatically flags unusual, statistically "bizarre" word combinations without needing a fixed list.
+
+6. **CMU Pronouncing Dictionary — Phonetic Alliteration**
+   - **Old:** Matched by the first letter of consecutive words.
+   - **New:** Uses the **CMU Pronouncing Dictionary** to map words to phonemes. Matches based on the first sound (e.g., "Phone" and "fire" now match on the /F/ sound).
+   - **Why:** Alliteration is a phonetic device, not an orthographic one.
+
+7. **WordNet Lemmatizer — Morphological Normalization**
+   - **Old:** Exact string matching against fixed lists.
+   - **New:** Tokens are reduced to their base form (e.g., *winds* → *wind*, *winked* → *wink*) before checking.
+   - **Why:** Ensures detection works regardless of word inflection or pluralization.
+
+### 🎨 UI Enhancements
+- **Confidence Bar:** Visual 0–100% bar on Metaphor, Hyperbole, and Sarcasm cards showing detection certainty.
+- **Method Comparison Box:** Displays side-by-side results of old vs. new methods for Simile, Alliteration, and Idiom cards.
+- **False Positive Badge:** Warns users when WordNet disagrees with the regex-based simile detection.
+
+
 ## 💻 Environment Setup
 To run this project locally, ensure you have Python installed (preferably via a standard Conda environment).
 
 **Required Core Libraries:**
 - `nltk` (Natural Language Toolkit)
 - `flask` (Web framework)
+- `transformers` & `torch` (Deep Learning models)
+- `pronouncing` (Phonetic analysis)
 - `regex` / `re` (Standard Regex engine)
 
 **Installation:**
 ```bash
-pip install nltk flask
+pip install nltk flask transformers torch pronouncing
 ```
 *(Note: The application will automatically download the required NLTK corpus datasets like `punkt`, `punkt_tab`, and `averaged_perceptron_tagger` on its first run).*
 
